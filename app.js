@@ -1,8 +1,17 @@
-const express = require('express')
+const app = require('express')()
+const bodyParser = require('body-parser')
 const { Pool, Client } = require('pg')
+// lodash
+const _ = require('lodash')
+const bcrypt = require('bcrypt')
 
-const app = express()
+const logger = require('./helper/logger')
 
+// initial body raw request
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+
+// initial postgre auth
 const pool = new Pool({
     user: 'postgres',
     password: '1234',
@@ -18,14 +27,34 @@ dotenv.config()
 //
 const port = process.env.PORT
 
-app.get('/', (req, res) => {
-    pool.query('SELECT NOW()', (err, result) => {
+// initial query name
+const query = {
+    text: '',
+    values: []
+};
 
-        // response of get
-        res.send(result)
+// create user account
+app.post('/users/create', (req, res) => {
+    query.text = `INSERT INTO users(username, password) VALUES($1, $2)`
 
-        pool.end()
+    //
+    _.forEach(req.body, (value, key) => {
+        if (key === 'password') value = bcrypt.hashSync(value, 10);
+        query.values.push(value)
     })
+
+    logger.info(query)
+
+    // pool.query(query, (err, result) => {
+    //     // response of get
+    //     res.send(result)
+    //     pool.end()
+    // })
+})
+
+// login user account
+app.post('/users/login', (req, res) => {
+
 })
 
 app.listen(port, () => {
