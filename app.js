@@ -35,26 +35,30 @@ const query = {
 
 // create user account
 app.post('/users/create', (req, res) => {
-    query.text = `INSERT INTO users(username, password) VALUES($1, $2)`
+    query.text = `INSERT INTO users(username, passwor) VALUES($1, $2)`
 
-    //
+    // mapping value password
     _.forEach(req.body, (value, key) => {
         if (key === 'password') value = bcrypt.hashSync(value, 10);
         query.values.push(value)
     })
 
-    logger.info(query)
-
-    // pool.query(query, (err, result) => {
-    //     // response of get
-    //     res.send(result)
-    //     pool.end()
-    // })
+    pool.query(query, (err, result) => {
+        console.log(err, result)
+        // response of get
+        // res.send(result)
+        // pool.end()
+    })
 })
 
 // login user account
 app.post('/users/login', (req, res) => {
 
+})
+
+// set logger middleware
+app.use((req, res, next) => {
+    console.log(res)
 })
 
 app.listen(port, () => {
