@@ -1,6 +1,7 @@
 const app = require('express')()
 const bodyParser = require('body-parser')
 const { Pool, Client } = require('pg')
+
 // lodash
 const _ = require('lodash')
 const bcrypt = require('bcrypt')
@@ -35,7 +36,7 @@ const query = {
 
 // create user account
 app.post('/users/create', (req, res) => {
-    query.text = `INSERT INTO users(username, passwor) VALUES($1, $2)`
+    query.text = `INSERT INTO users(username, password) VALUES($1, $2)`
 
     // mapping value password
     _.forEach(req.body, (value, key) => {
@@ -44,10 +45,7 @@ app.post('/users/create', (req, res) => {
     })
 
     pool.query(query, (err, result) => {
-        console.log(err, result)
-        // response of get
-        // res.send(result)
-        // pool.end()
+        res.send(result)
     })
 })
 
